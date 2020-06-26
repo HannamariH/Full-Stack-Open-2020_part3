@@ -1,11 +1,27 @@
+require("dotenv").config()
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
 const app = express()
+const mongoose = require('mongoose')
+const Person = require('./models/person')
 
 app.use(express.json())
 app.use(express.static("build"))
 app.use(cors())
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
 
 morgan.token("body", (req, res) => {
   return JSON.stringify(req.body)
@@ -53,17 +69,22 @@ app.get("/info", (req, res) => {
 })
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  }) 
 })
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id)
+  Person.findById(request.params.id).then(person => {
+    response.json(person)
+  })
+  /*const id = Number(request.params.id)
   const person = persons.find((p) => p.id === id)
   if (person) {
     response.json(person)
   } else {
     response.status(404).end()
-  }
+  }*/
 })
 
 const generateId = () => {
@@ -94,14 +115,15 @@ app.post("/api/persons", (request, response) => {
       })
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
-    number: body.number || false,
+    number: body.number,
     id: generateId()
-  }
+  })
 
-  persons = persons.concat(person)
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -116,7 +138,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
