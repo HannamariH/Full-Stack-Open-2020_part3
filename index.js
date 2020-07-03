@@ -3,7 +3,6 @@ const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
 const app = express()
-const mongoose = require("mongoose")
 
 const Person = require("./models/person")
 
@@ -13,7 +12,7 @@ app.use(cors())
 
 
 
-morgan.token("body", (req, res) => {
+morgan.token("body", (req) => {
   return JSON.stringify(req.body)
 })
 
@@ -78,7 +77,7 @@ app.post("/api/persons", (request, response, next) => {
 })
 
 app.put("/api/persons/:id", (request, response, next) => {
-  newPerson = {
+  const newPerson = {
     name: request.body.name,
     number: request.body.number,
   }
@@ -91,7 +90,7 @@ app.put("/api/persons/:id", (request, response, next) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end()
     })
     .catch((error) => next(error))

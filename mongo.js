@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-mongoose.set('useFindAndModify', false)
+mongoose.set("useFindAndModify", false)
 
 if (process.argv.length < 3) {
   console.log("give password as argument")
@@ -43,7 +43,7 @@ if (process.argv.length > 3) {
   })
 
   //tallenttaa uuden henkilön
-  person.save().then((response) => {
+  person.save().then(() => {
     console.log(`added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
   })
