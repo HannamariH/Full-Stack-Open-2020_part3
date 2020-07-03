@@ -5,6 +5,7 @@ const cors = require("cors")
 const app = express()
 const mongoose = require('mongoose')
 const Person = require('./models/person')
+const person = require("./models/person")
 
 app.use(express.static("build"))
 app.use(express.json())
@@ -39,16 +40,22 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger)
 
-app.get("/info", (req, res) => {
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`
-  )
+app.get("/info", (req, res, next) => {
+  Person.countDocuments({})
+  .then(persons => {
+    res.send(
+      `<p>Phonebook has info for ${persons} people</p><p>${new Date()}</p>`
+    )
+  })
+  .catch(error => next(error))
 })
 
-app.get("/api/persons", (req, res) => {
-  Person.find({}).then(persons => {
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+  .then(persons => {
     res.json(persons)
   }) 
+  .catch(error => next(error))
 })
 
 app.get("/api/persons/:id", (request, response, next) => {
