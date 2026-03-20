@@ -20,7 +20,7 @@
     "singleQuote": false
   },
   "devDependencies": {
-    "eslint": "^7.3.1",
+    "eslint": "^7.32.0",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
